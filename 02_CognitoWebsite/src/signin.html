@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cognito</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="js/lib/aws-cognito/jsbn.js"></script>
+  <script src="js/lib/aws-cognito/jsbn2.js"></script>
+  <script src="js/lib/aws-cognito/sjcl.js"></script>
+  <script src="js/lib/aws-cognito/aws-sdk.min.js"></script>
+  <script src="js/lib/aws-cognito/aws-cognito-sdk.min.js"></script>
+  <script src="js/lib/aws-cognito/amazon-cognito-identity.min.js"></script>
+  <script src="js/userpool.js"></script>
+  <script src="js/signin.js"></script>
+</head>
+<body class="container">
+  <h1>Cognito SignIn</h1>
+  <form>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" type="email" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" type="password" class="form-control">
+    </div>
+    <div id="error-message" class="alert alert-danger" role="alert" style="display: none"></div>
+    <button id="signinButton" type="submit" class="btn btn-primary">SignIn</button>
+  </form>
+  <p class="text-right"><a href="./signup.html">SignUp here</a></p>
+</body>
+</html>

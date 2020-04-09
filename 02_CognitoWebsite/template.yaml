@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  02_CognitoWebsite
+
+  Cognito User Pool
+
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AutoVerifiedAttributes:
+      - email
+      EmailVerificationMessage: "Your verification code is {####}."
+      EmailVerificationSubject: "Your verification code"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: true
+      Schema:
+      - Name: name
+        AttributeDataType: String
+        Mutable: true
+        Required: true
+      - Name: email
+        AttributeDataType: String
+        Mutable: false
+        Required: true
+      UserPoolName: !Ref AWS::StackName
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+  S3:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      AccessControl: "PublicRead"
+      WebsiteConfiguration:
+        ErrorDocument: "error.html"
+        IndexDocument: "index.html"
+
+Outputs:
+  UserPool:
+    Description: "UserPoolId"
+    Value: !Ref UserPool
+  UserPoolClient:
+    Description: "ClientId"
+    Value: !Ref UserPoolClient
+  S3:
+    Description: "BucketName"
+    Value: !Ref S3
+  WebSite:
+    Description: "WebSite URL"
+    Value: !Sub "http://${S3}.s3-website-${AWS::Region}.amazonaws.com/"
