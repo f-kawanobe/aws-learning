@@ -4,6 +4,8 @@
 
 Cognitoによるサインアップとサインインを実装する
 
+![architecture](https://user-images.githubusercontent.com/43918772/78852987-bcb65c80-7a58-11ea-8022-50399f8e7f93.png)
+
 ## デプロイ手順
 
 ### template.yamlに従ってビルドする
