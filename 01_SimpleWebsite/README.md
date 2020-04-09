@@ -60,7 +60,7 @@ aws s3 sync ./src s3://[S3のバケット名] --acl public-read
 
 ![index](https://user-images.githubusercontent.com/43918772/78847914-292a5f00-7a4b-11ea-9fac-9bc227e70e0c.png)
 
-## 型付け
+## 片付け
 
 ### S3バケットの中身を空にする
 

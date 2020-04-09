@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  03_LambdaApi
+
+  lambda function with wsgi
+
+Parameters:
+  Stage:
+    Type: String
+    Default: Prod
+
+Resources:
+  SampleApi:
+    Properties:
+      StageName: !Ref Stage
+    Type: AWS::Serverless::Api
+  SampleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sample_function/
+      Handler: handler.lambda_handler
+      Runtime: python3.8
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            Path: /
+            Method: any
+            RestApiId: !Ref SampleApi
+        Proxy:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+            RestApiId: !Ref SampleApi
+
+Outputs:
+  SampleApi:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${SampleApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/"
