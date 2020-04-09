@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sub1
+
+  Simple WebSite Deploy
+
+Resources:
+  S3:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      AccessControl: "PublicRead"
+      WebsiteConfiguration:
+        ErrorDocument: "error.html"
+        IndexDocument: "index.html"
+
+Outputs:
+  S3:
+    Description: "BucketName"
+    Value: !Ref S3
+  WebSite:
+    Description: "WebSite URL"
+    Value: !Sub "http://${S3}.s3-website-${AWS::Region}.amazonaws.com/"
