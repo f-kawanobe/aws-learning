@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  04_LambdaDynamoApi
+
+  lambda function with dynamodb
+
+Parameters:
+  Stage:
+    Type: String
+    Default: Prod
+
+Resources:
+  DynamoTableSequences:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "sequences"
+      AttributeDefinitions:
+      - AttributeName: "table"
+        AttributeType: "S"
+      KeySchema:
+      - AttributeName: "table"
+        KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  DynamoTableItems:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "items"
+      AttributeDefinitions:
+      - AttributeName: "id"
+        AttributeType: "N"
+      - AttributeName: "type"
+        AttributeType: "S"
+      KeySchema:
+      - AttributeName: "id"
+        KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      GlobalSecondaryIndexes:
+      - IndexName: "type-index"
+        KeySchema:
+        - AttributeName: "type"
+          KeyType: "HASH"
+        Projection:
+          ProjectionType: "ALL"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+  SampleApi:
+    Properties:
+      StageName: !Ref Stage
+      Cors:
+        AllowOrigin: "'*'"
+    Type: AWS::Serverless::Api
+  SampleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 60
+      Role: !GetAtt SampleFunctionRole.Arn
+      CodeUri: sample_function/
+      Handler: handler.lambda_handler
+      Runtime: python3.8
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            Path: /
+            Method: any
+            RestApiId: !Ref SampleApi
+        Proxy:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+            RestApiId: !Ref SampleApi
+  SampleFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - 'lambda.amazonaws.com'
+          Action:
+          - 'sts:AssumeRole'
+      Policies:
+      - PolicyName: 'HelloWorldFunctionPolicy'
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            Resource:
+            - !GetAtt DynamoTableItems.Arn
+            - !Join [ "/", [ !GetAtt DynamoTableItems.Arn, "index/*" ] ]
+            - !GetAtt DynamoTableSequences.Arn
+  S3:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      AccessControl: "PublicRead"
+      WebsiteConfiguration:
+        ErrorDocument: "error.html"
+        IndexDocument: "index.html"
+
+Outputs:
+  SampleApi:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${SampleApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+  S3:
+    Description: "BucketName"
+    Value: !Ref S3
+  WebSite:
+    Description: "WebSite URL"
+    Value: !Sub "http://${S3}.s3-website-${AWS::Region}.amazonaws.com/"
