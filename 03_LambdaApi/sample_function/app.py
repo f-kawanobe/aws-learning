@@ -1,4 +1,4 @@
-from bottle import Bottle
+from bottle import Bottle, response
 
 
 app = Bottle()
@@ -12,3 +12,8 @@ def get_index():
 @app.get('/hello/<name>')
 def get_hello(name):
     return 'Hello %s!' % name
+
+
+@app.hook('after_request')
+def enable_cors():
+    response.headers['Access-Control-Allow-Origin'] = '*'
